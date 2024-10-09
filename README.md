@@ -102,4 +102,4 @@ npm start
 
 ## 💡 Usage
 
-You can test the API using tools like Postman or cURL. Make sure to send requests with the appropriate HTTP methods and payloads as described in the API endpoints section. I have included a Postman collection in the `assets` folder for your convenience.
+You can test the API using tools like [Postman](https://www.postman.com/) or cURL. Make sure to send requests with the appropriate HTTP methods and payloads as described in the API endpoints section. I have included a Postman collection in the `postman` folder for your convenience.
