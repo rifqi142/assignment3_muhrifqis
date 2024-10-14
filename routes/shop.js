@@ -8,6 +8,7 @@ const {
   createInventory,
   getAllInventory,
   getInventoryById,
+  getInventoryByPriceAndName,
   getInventoryByName,
   updateInventory,
   deleteInventory,
@@ -21,6 +22,9 @@ router.get("/inventory/all", getAllInventory);
 
 // [GET] /shop/inventory/:id
 router.get("/inventory/:product_id", getInventoryById);
+
+// [GET] /shop/inventory?price=
+router.get("/inventory", getInventoryByPriceAndName);
 
 // [GET] /shop/inventory/name/:name
 router.get("/inventory/name/:product_name", getInventoryByName);

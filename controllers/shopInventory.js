@@ -46,7 +46,14 @@ const getAllInventory = async (req, res) => {
     res.status(200).json({
       status: "success",
       code: 200,
-      data: inventory,
+      data: {
+        totalData: inventory.length,
+        totalPrice: inventory.reduce(
+          (acc, item) => acc + item.product_price,
+          0
+        ),
+        inventory,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -125,7 +132,60 @@ const getInventoryByName = async (req, res) => {
   }
 };
 
-// update product by id
+// get product by price and name query params
+const getInventoryByPriceAndName = async (req, res) => {
+  try {
+    const { product_price, product_name } = req.query;
+
+    if (!product_price && !product_name) {
+      return res.status(400).json({
+        status: "failed",
+        code: 400,
+        message: "Product price or name is required",
+      });
+    }
+
+    let whereConditions = {};
+
+    if (product_price) {
+      whereConditions.product_price = {
+        [Op.eq]: product_price,
+      };
+    }
+
+    if (product_name) {
+      whereConditions.product_name = {
+        [Op.like]: `%${product_name}%`,
+      };
+    }
+
+    const inventories = await Inventory.findAll({
+      where: whereConditions,
+    });
+
+    if (inventories.length === 0) {
+      return res.status(404).json({
+        status: "failed",
+        code: 404,
+        message: "No products found with the specified criteria",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      data: inventories,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "failed",
+      code: 500,
+      message: error.message,
+    });
+  }
+};
+
+// update product by id and return previous data
 const updateInventory = async (req, res) => {
   try {
     const { product_id } = req.params;
@@ -160,6 +220,9 @@ const updateInventory = async (req, res) => {
       });
     }
 
+    // get previous data
+    const previousData = { ...inventory.dataValues };
+
     inventory.product_name = product_name;
     inventory.product_quantity = product_quantity;
     inventory.product_price = product_price;
@@ -172,7 +235,10 @@ const updateInventory = async (req, res) => {
       status: "success",
       code: 200,
       message: "Product has been updated",
-      data: inventory,
+      data: {
+        previousData: previousData,
+        updatedData: inventory,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -216,6 +282,7 @@ module.exports = {
   createInventory,
   getAllInventory,
   getInventoryById,
+  getInventoryByPriceAndName,
   getInventoryByName,
   updateInventory,
   deleteInventory,
